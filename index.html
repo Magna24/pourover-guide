@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pour — Coffee Timer</title>
+    <style>
+      html,
+      body,
+      #root {
+        min-height: 100%;
+        margin: 0;
+      }
+
+      .preview-error {
+        box-sizing: border-box;
+        max-width: 720px;
+        margin: 48px auto;
+        padding: 20px;
+        border: 1px solid #c0392b;
+        border-radius: 6px;
+        background: #fff7f5;
+        color: #541d17;
+        font: 14px/1.5 system-ui, sans-serif;
+        white-space: pre-wrap;
+      }
+    </style>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      (async function bootPreview() {
+        const root = document.getElementById("root");
+
+        try {
+          if (!window.React || !window.ReactDOM || !window.Babel) {
+            throw new Error(
+              "React, ReactDOM, or Babel did not load. Check your internet connection, then refresh."
+            );
+          }
+
+          const response = await fetch("./pour_over_assistant.jsx");
+          if (!response.ok) {
+            throw new Error("Could not load pour_over_assistant.jsx");
+          }
+
+          const source = await response.text();
+          const runnableSource = source
+            .replace(
+              /^import React, \{ useState, useEffect, useRef, useMemo \} from ["']react["'];\s*/m,
+              "const { useState, useEffect, useRef, useMemo } = React;\n"
+            )
+            .replace(
+              /export default function PourOverApp/,
+              "function PourOverApp"
+            );
+
+          const compiled = Babel.transform(runnableSource, {
+            filename: "pour_over_assistant.jsx",
+            presets: [["react", { runtime: "classic" }]],
+          }).code;
+
+          Function(
+            "React",
+            "ReactDOM",
+            compiled +
+              "\nReactDOM.createRoot(document.getElementById('root')).render(React.createElement(PourOverApp));"
+          )(window.React, window.ReactDOM);
+        } catch (error) {
+          console.error(error);
+          root.innerHTML =
+            '<div class="preview-error"><strong>Preview failed.</strong>\n\n' +
+            String(error && error.message ? error.message : error) +
+            "</div>";
+        }
+      })();
+    </script>
+  </body>
+</html>
