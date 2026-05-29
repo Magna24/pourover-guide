@@ -859,6 +859,24 @@ export default function PourOverApp() {
       "https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,700;1,900&family=Inconsolata:wght@400;700&display=swap";
     link.rel = "stylesheet";
     document.head.appendChild(link);
+    // Keep screen awake
+    let wakeLock = null;
+    const requestWakeLock = async () => {
+      try {
+        if (navigator.wakeLock) {
+          wakeLock = await navigator.wakeLock.request("screen");
+        }
+      } catch {}
+    };
+    requestWakeLock();
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") requestWakeLock();
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      if (wakeLock) wakeLock.release().catch(() => {});
+    };
   }, []);
 
   const toggleTempUnit = () => {
@@ -1411,20 +1429,23 @@ function BrewView({ recipe, brewResult, onSaveResult, onBack, tempUnit, onToggle
         <button type="button" style={{ ...styles.backLink, marginBottom: 0 }} onClick={onBack}>
           ← Back to Recipe
         </button>
-        <button style={styles.unitToggle} onClick={onToggleUnit}>
-          °{tempUnit}
-        </button>
       </div>
 
       {elapsed === 0 && !running ? (
         <div style={{ ...styles.card, cursor: "default" }}>
-          <label style={styles.inputLabel}>Grind used</label>
+          <label style={styles.inputLabel}>Grind used <span style={{ color: "#c0392b" }}>*</span></label>
           <input
-            style={{ ...styles.input, marginBottom: 0 }}
+            style={{ ...styles.input, marginBottom: 0, borderColor: grindSetting.trim() ? "#d9cfbc" : "#c0392b" }}
             value={grindSetting}
             onChange={(e) => setGrindSetting(e.target.value)}
             placeholder={recipe.grind || "e.g. 18 clicks"}
+            autoFocus
           />
+          {!grindSetting.trim() && (
+            <div style={{ fontSize: "11px", color: "#c0392b", fontFamily: "'Inconsolata', monospace", marginTop: "6px" }}>
+              Enter your grind setting before starting.
+            </div>
+          )}
         </div>
       ) : (
         <div style={{ ...styles.brewNote, marginTop: 0 }}>
@@ -1448,8 +1469,6 @@ function BrewView({ recipe, brewResult, onSaveResult, onBack, tempUnit, onToggle
             <div style={styles.stageCountdown}>{fmtTime(stageTimeLeft)}</div>
           </>
         )}
-        <div style={styles.tempBadgeLabel}>Water Temp</div>
-        <div style={styles.tempBadge}>{formatTemp(recipe.tempC, tempUnit)}</div>
       </div>
 
       <div style={styles.instructionBox}>
@@ -1481,8 +1500,10 @@ function BrewView({ recipe, brewResult, onSaveResult, onBack, tempUnit, onToggle
             ...styles.button,
             padding: "22px",
             fontSize: "16px",
+            opacity: grindSetting.trim() ? 1 : 0.4,
+            cursor: grindSetting.trim() ? "pointer" : "not-allowed",
           }}
-          onClick={startTimer}
+          onClick={grindSetting.trim() ? startTimer : undefined}
         >
           ▶ Start
         </button>
