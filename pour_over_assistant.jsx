@@ -1342,9 +1342,7 @@ function DetailView({ recipe, brewResult, isStarred, onToggleStar, onDelete, onB
 function BrewView({ recipe, brewResult, onSaveResult, onBack, tempUnit, onToggleUnit }) {
   const [running, setRunning] = useState(false);
   const [elapsed, setElapsed] = useState(0);
-  const [grindSetting, setGrindSetting] = useState(
-    brewResult?.grindSetting || recipe.grind || ""
-  );
+  const [grindSetting, setGrindSetting] = useState("");
   const lastStageRef = useRef(-1);
   const startTimeRef = useRef(null);
   const accumulatedRef = useRef(0);
@@ -1431,7 +1429,7 @@ function BrewView({ recipe, brewResult, onSaveResult, onBack, tempUnit, onToggle
         </button>
       </div>
 
-      {elapsed === 0 && !running ? (
+      {elapsed === 0 && !running && (
         <div style={{ ...styles.card, cursor: "default" }}>
           <label style={styles.inputLabel}>Grind used <span style={{ color: "#c0392b" }}>*</span></label>
           <input
@@ -1446,10 +1444,6 @@ function BrewView({ recipe, brewResult, onSaveResult, onBack, tempUnit, onToggle
               Enter your grind setting before starting.
             </div>
           )}
-        </div>
-      ) : (
-        <div style={{ ...styles.brewNote, marginTop: 0 }}>
-          <strong>Grind used:</strong> {grindSetting.trim() || "not recorded"}
         </div>
       )}
 
