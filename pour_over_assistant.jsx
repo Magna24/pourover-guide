@@ -1488,6 +1488,21 @@ function BrewView({ recipe, brewResult, onSaveResult, onBack, tempUnit, onToggle
         )}
       </div>
 
+      <div style={styles.stageList}>
+        <div style={styles.sectionLabel}>Next Stages</div>
+        {recipe.stages.map((s, i) => {
+          const isActive = i === currentStageIdx && !isDone;
+          const isPast = elapsed >= s.end;
+          if (isPast) return null;
+          return (
+            <div key={i} style={isActive ? styles.stageRowActive : styles.stageRow}>
+              <div style={styles.stageTime}>{fmtTime(s.start)}</div>
+              <div style={styles.stageInstr}>{s.instruction}</div>
+            </div>
+          );
+        })}
+      </div>
+
       {!running && elapsed === 0 && (
         <button
           style={{
@@ -1518,25 +1533,6 @@ function BrewView({ recipe, brewResult, onSaveResult, onBack, tempUnit, onToggle
           ↺ Reset
         </button>
       )}
-
-      <div style={styles.stageList}>
-        <div style={styles.sectionLabel}>All Stages</div>
-        {recipe.stages.map((s, i) => {
-          const isActive = i === currentStageIdx && !isDone;
-          const isDoneStage = elapsed >= s.end;
-          const style = isActive
-            ? styles.stageRowActive
-            : isDoneStage
-            ? styles.stageRowDone
-            : styles.stageRow;
-          return (
-            <div key={i} style={style}>
-              <div style={styles.stageTime}>{fmtTime(s.start)}</div>
-              <div style={styles.stageInstr}>{s.instruction}</div>
-            </div>
-          );
-        })}
-      </div>
     </>
   );
 }
