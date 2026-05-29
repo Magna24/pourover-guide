@@ -1346,7 +1346,9 @@ function DetailView({ recipe, brewResult, isStarred, onToggleStar, onDelete, onB
 function BrewView({ recipe, brewResult, onSaveResult, onBack, tempUnit, onToggleUnit }) {
   const [running, setRunning] = useState(false);
   const [elapsed, setElapsed] = useState(0);
-  const [grindSetting, setGrindSetting] = useState("20");
+  const prevGrind = brewResult?.grindSetting ? String(brewResult.grindSetting) : null;
+  const [grindSetting, setGrindSetting] = useState(prevGrind || "20");
+  const [grindTouched, setGrindTouched] = useState(!!prevGrind);
   const lastStageRef = useRef(-1);
   const startTimeRef = useRef(null);
   const accumulatedRef = useRef(0);
@@ -1446,20 +1448,31 @@ function BrewView({ recipe, brewResult, onSaveResult, onBack, tempUnit, onToggle
             min="10"
             max="30"
             value={grindSetting}
-            onChange={(e) => setGrindSetting(e.target.value)}
+            onChange={(e) => { setGrindSetting(e.target.value); setGrindTouched(true); }}
             style={{ width: "100%", accentColor: "#1a1612", cursor: "pointer" }}
           />
           <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "'Inconsolata', monospace", fontSize: "11px", color: "#7a6d5c", marginTop: "4px" }}>
             <span>10</span>
             <span>30</span>
           </div>
+          {!grindTouched && (
+            <div style={{ fontSize: "11px", color: "#c0392b", fontFamily: "'Inconsolata', monospace", marginTop: "6px" }}>
+              Move the slider to set your grind before starting.
+            </div>
+          )}
         </div>
       )}
 
       {!running && elapsed === 0 && (
         <button
-          style={{ ...styles.button, padding: "22px", fontSize: "16px" }}
-          onClick={startTimer}
+          style={{
+            ...styles.button,
+            padding: "22px",
+            fontSize: "16px",
+            opacity: grindTouched ? 1 : 0.4,
+            cursor: grindTouched ? "pointer" : "not-allowed",
+          }}
+          onClick={grindTouched ? startTimer : undefined}
         >
           ▶ Start
         </button>
