@@ -1429,6 +1429,21 @@ function BrewView({ recipe, brewResult, onSaveResult, onBack, tempUnit, onToggle
         </button>
       </div>
 
+      {!running && elapsed === 0 && (
+        <button
+          style={{
+            ...styles.button,
+            padding: "22px",
+            fontSize: "16px",
+            opacity: grindSetting.trim() ? 1 : 0.4,
+            cursor: grindSetting.trim() ? "pointer" : "not-allowed",
+          }}
+          onClick={grindSetting.trim() ? startTimer : undefined}
+        >
+          ▶ Start
+        </button>
+      )}
+
       {elapsed === 0 && !running && (
         <div style={{ ...styles.card, cursor: "default" }}>
           <label style={styles.inputLabel}>Grind used <span style={{ color: "#c0392b" }}>*</span></label>
@@ -1503,20 +1518,6 @@ function BrewView({ recipe, brewResult, onSaveResult, onBack, tempUnit, onToggle
         })}
       </div>
 
-      {!running && elapsed === 0 && (
-        <button
-          style={{
-            ...styles.button,
-            padding: "22px",
-            fontSize: "16px",
-            opacity: grindSetting.trim() ? 1 : 0.4,
-            cursor: grindSetting.trim() ? "pointer" : "not-allowed",
-          }}
-          onClick={grindSetting.trim() ? startTimer : undefined}
-        >
-          ▶ Start
-        </button>
-      )}
       <button
         style={{
           ...styles.button,
