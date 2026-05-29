@@ -1348,7 +1348,7 @@ function BrewView({ recipe, brewResult, onSaveResult, onBack, tempUnit, onToggle
   const [elapsed, setElapsed] = useState(0);
   const prevGrind = brewResult?.grindSetting ? String(brewResult.grindSetting) : null;
   const [grindSetting, setGrindSetting] = useState(prevGrind || "20");
-  const [grindTouched, setGrindTouched] = useState(!!prevGrind);
+  const [grindTouched, setGrindTouched] = useState(false);
   const lastStageRef = useRef(-1);
   const startTimeRef = useRef(null);
   const accumulatedRef = useRef(0);
