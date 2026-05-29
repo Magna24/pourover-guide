@@ -1346,7 +1346,7 @@ function DetailView({ recipe, brewResult, isStarred, onToggleStar, onDelete, onB
 function BrewView({ recipe, brewResult, onSaveResult, onBack, tempUnit, onToggleUnit }) {
   const [running, setRunning] = useState(false);
   const [elapsed, setElapsed] = useState(0);
-  const [grindSetting, setGrindSetting] = useState("");
+  const [grindSetting, setGrindSetting] = useState("20");
   const lastStageRef = useRef(-1);
   const startTimeRef = useRef(null);
   const accumulatedRef = useRef(0);
@@ -1435,32 +1435,31 @@ function BrewView({ recipe, brewResult, onSaveResult, onBack, tempUnit, onToggle
 
       {elapsed === 0 && !running && (
         <div style={{ ...styles.card, cursor: "default" }}>
-          <label style={styles.inputLabel}>Grind used <span style={{ color: "#c0392b" }}>*</span></label>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "10px" }}>
+            <label style={{ ...styles.inputLabel, marginBottom: 0 }}>Grind setting</label>
+            <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontStyle: "italic", fontSize: "28px", lineHeight: 1 }}>
+              {grindSetting}
+            </span>
+          </div>
           <input
-            style={{ ...styles.input, marginBottom: 0, borderColor: grindSetting.trim() ? "#d9cfbc" : "#c0392b" }}
+            type="range"
+            min="10"
+            max="30"
             value={grindSetting}
             onChange={(e) => setGrindSetting(e.target.value)}
-            placeholder={recipe.grind || "e.g. 18 clicks"}
-            autoFocus
+            style={{ width: "100%", accentColor: "#1a1612", cursor: "pointer" }}
           />
-          {!grindSetting.trim() && (
-            <div style={{ fontSize: "11px", color: "#c0392b", fontFamily: "'Inconsolata', monospace", marginTop: "6px" }}>
-              Enter your grind setting before starting.
-            </div>
-          )}
+          <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "'Inconsolata', monospace", fontSize: "11px", color: "#7a6d5c", marginTop: "4px" }}>
+            <span>10</span>
+            <span>30</span>
+          </div>
         </div>
       )}
 
       {!running && elapsed === 0 && (
         <button
-          style={{
-            ...styles.button,
-            padding: "22px",
-            fontSize: "16px",
-            opacity: grindSetting.trim() ? 1 : 0.4,
-            cursor: grindSetting.trim() ? "pointer" : "not-allowed",
-          }}
-          onClick={grindSetting.trim() ? startTimer : undefined}
+          style={{ ...styles.button, padding: "22px", fontSize: "16px" }}
+          onClick={startTimer}
         >
           ▶ Start
         </button>
